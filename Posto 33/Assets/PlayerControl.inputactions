@@ -88,7 +88,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Brea",
+                    "name": "Lock",
                     "type": "Button",
                     "id": "543e0473-9b34-4d55-ac21-1b3a91367c87",
                     "expectedControlType": "",
@@ -497,11 +497,11 @@
                 {
                     "name": "",
                     "id": "015533a4-f089-4e52-8c54-485228fce9ce",
-                    "path": "",
+                    "path": "<Keyboard>/alt",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Brea",
+                    "action": "Lock",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

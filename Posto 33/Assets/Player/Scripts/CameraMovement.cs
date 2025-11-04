@@ -4,8 +4,8 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public float moveSpeed = 5f;
-    public float lookSensitivity = 2f;
+    public float moveSpeed = 3f;
+    public float lookSensitivity = 1f;
 
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -22,6 +22,13 @@ public class CameraMovement : MonoBehaviour
 
         controls.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
         controls.Player.Look.canceled += ctx => lookInput = Vector2.zero;
+
+        controls.Player.Lock.performed += ctx => {
+
+            Cursor.visible = !Cursor.visible;
+            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
+
+        };
     }
 
     void OnEnable() => controls.Enable();
