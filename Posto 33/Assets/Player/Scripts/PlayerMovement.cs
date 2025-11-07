@@ -15,7 +15,6 @@ public class PlayerMovement : MonoBehaviour
     private bool walking = false;
     private bool canStep = true;
 
-
     private Rigidbody rb;
     private Vector2 moveInput;
     private PlayerControl controls;
@@ -28,13 +27,12 @@ public class PlayerMovement : MonoBehaviour
 
         controls.Player.Move.performed += ctx =>
         {
-            walking = true;
             moveInput = ctx.ReadValue<Vector2>();
         };
         controls.Player.Move.canceled += ctx => {
-            walking = false;
             moveInput = Vector2.zero;
         };
+       
     }
 
     void OnEnable()
