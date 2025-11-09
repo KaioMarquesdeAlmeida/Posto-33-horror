@@ -2,6 +2,7 @@
 using KinematicCharacterController.Examples;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
 
@@ -9,13 +10,8 @@ namespace KinematicCharacterController.Examples
 {
     public class ExamplePlayer : MonoBehaviour
     {
+        public Animator animator;
         public ExampleCharacterController Character;
-
-        private const string MouseXInput = "Mouse X";
-        private const string MouseYInput = "Mouse Y";
-        private const string MouseScrollInput = "Mouse ScrollWheel";
-        private const string HorizontalInput = "Horizontal";
-        private const string VerticalInput = "Vertical";
 
         private Vector2 moveInput;
 
@@ -27,10 +23,12 @@ namespace KinematicCharacterController.Examples
 
             controls.Player.Move.performed += ctx =>
             {
+                animator.SetBool("walking", true);
 
                 moveInput = ctx.ReadValue<Vector2>();
             };
             controls.Player.Move.canceled += ctx => {
+                animator.SetBool("walking", false);
 
                 moveInput = Vector2.zero;
             };
@@ -76,12 +74,7 @@ namespace KinematicCharacterController.Examples
                 MoveAxisForward = moveInput.x,
                 MoveAxisRight = moveInput.y
             };
-            //   characterInputs.CameraRotation = CharacterCamera.Transform.rotation;
-            //   characterInputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
-            // characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
-            // characterInputs.CrouchUp = Input.GetKeyUp(KeyCode.C);
 
-            // Apply inputs to character
             Character.SetInputs(ref characterInputs);
         }
     }

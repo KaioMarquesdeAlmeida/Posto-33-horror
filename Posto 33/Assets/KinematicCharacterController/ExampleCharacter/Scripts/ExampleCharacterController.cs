@@ -21,10 +21,7 @@ namespace KinematicCharacterController.Examples
     {
         public float MoveAxisForward;
         public float MoveAxisRight;
-        public Quaternion CameraRotation;
-        public bool JumpDown;
-        public bool CrouchDown;
-        public bool CrouchUp;
+
     }
 
     public struct AICharacterInputs
@@ -146,7 +143,7 @@ namespace KinematicCharacterController.Examples
             // Debug.Log(inputs.MoveAxisForward);
             // Clamp input
             Vector3 localMove = root.transform.right * inputs.MoveAxisForward + root.transform.forward * inputs.MoveAxisRight;
-            Vector3 horizontalVelocity = Mathf.Min(1f, localMove.magnitude) * 1 * localMove.normalized;
+            Vector3 horizontalVelocity = Mathf.Min(1f, localMove.magnitude) * 0.5f * localMove.normalized;
             Vector3 moveInputVector = Vector3.ClampMagnitude(horizontalVelocity, 1f);
 
             // Calculate camera direction and rotation on the character plane
@@ -168,29 +165,7 @@ namespace KinematicCharacterController.Examples
                                 break;
                         }
 
-                        // Jumping input
-                        if (inputs.JumpDown)
-                        {
-                            _timeSinceJumpRequested = 0f;
-                            _jumpRequested = true;
-                        }
-
-                        // Crouching input
-                        if (inputs.CrouchDown)
-                        {
-                            _shouldBeCrouching = true;
-
-                            if (!_isCrouching)
-                            {
-                                _isCrouching = true;
-                                Motor.SetCapsuleDimensions(0.5f, CrouchedCapsuleHeight, CrouchedCapsuleHeight * 0.5f);
-                                MeshRoot.localScale = new Vector3(1f, 0.5f, 1f);
-                            }
-                        }
-                        else if (inputs.CrouchUp)
-                        {
-                            _shouldBeCrouching = false;
-                        }
+                       
 
                         break;
                     }
