@@ -5,15 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Photon/QuantumAddons/KCC/Example/Scenes/Menu.unity
     guid: 1c688421baac30a478e363a36abfcea6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Photon/QuantumAddons/KCC/Example/Scenes/Showcase.unity
     guid: 9ab2d6578981568418663b788d11a212
-  - enabled: 1
+  - enabled: 0
     path: Assets/Photon/QuantumAddons/KCC/Example/Scenes/Playground.unity
     guid: 420798b129e24fb4cae81a081a144f75
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 192b77ac7bbba034cad1c6b004bd2c0b
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 8067e0a3499c4b44ab5a819cfe0c9f88, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
