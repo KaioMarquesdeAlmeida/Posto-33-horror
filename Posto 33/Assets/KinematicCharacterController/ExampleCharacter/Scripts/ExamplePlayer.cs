@@ -10,7 +10,6 @@ namespace KinematicCharacterController.Examples
 {
     public class ExamplePlayer : MonoBehaviour
     {
-        public Animator animator;
         public ExampleCharacterController Character;
 
         private Vector2 moveInput;
@@ -23,12 +22,10 @@ namespace KinematicCharacterController.Examples
 
             controls.Player.Move.performed += ctx =>
             {
-                animator.SetBool("walking", true);
 
                 moveInput = ctx.ReadValue<Vector2>();
             };
             controls.Player.Move.canceled += ctx => {
-                animator.SetBool("walking", false);
 
                 moveInput = Vector2.zero;
             };
