@@ -891,7 +891,13 @@ PlayerSettings:
   XboxOneOverrideIdentityName: 
   XboxOneOverrideIdentityPublisher: 
   vrEditorSettings: {}
-  cloudServicesEnabled: {}
+  cloudServicesEnabled:
+    Build: 0
+    Game Performance: 0
+    Legacy Analytics: 0
+    Purchasing: 0
+    UDP: 0
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -913,11 +919,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 63b6eb2e-0342-4435-af5a-1f7a72b05ff4
+  cloudProjectId: 5b4a296c-f96a-4e6e-aa57-58d4ea7e5939
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: Posto 33
-  organizationId: unity_b8f09369a6df10a84009
+  organizationId: luixbenevides
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

@@ -40,59 +40,25 @@ public class EnemyAI : MonoBehaviour
 
     // Variáveis privadas
     private Transform currentDest;
-    private Vector3 dest;
     private int randNum;
-    private float idleTime;
     private float chaseTime;
     private bool walking;
     private bool chasing;
-    private bool isOnStairs;
-    private float lastHeight;
+    private bool isWaiting = false; 
 
     void Start()
     {
-        // Verificações de segurança
-        if (destinations == null || destinations.Count == 0)
+        if (destinations.Count > 0)
         {
-            Debug.LogError("EnemyAI: Lista de destinations está vazia!");
-            enabled = false;
-            return;
+            currentDest = destinations[Random.Range(0, destinations.Count)];
         }
-
-        if (ai == null)
-        {
-            Debug.LogError("EnemyAI: NavMeshAgent não atribuído!");
-            enabled = false;
-            return;
-        }
-
-        if (player == null)
-        {
-            Debug.LogError("EnemyAI: Player não atribuído!");
-            enabled = false;
-            return;
-        }
-
-        // Verifica se está no NavMesh
-        if (!ai.isOnNavMesh)
-        {
-            Debug.LogError("EnemyAI: Inimigo não está sobre o NavMesh! Crie o NavMesh (Window → AI → Navigation → Bake)");
-            enabled = false;
-            return;
-        }
-
-        // Inicialização
         walking = true;
-        lastHeight = transform.position.y;
-        randNum = Random.Range(0, destinations.Count);
-        currentDest = destinations[randNum];
     }
 
     void Update()
     {
         if (player == null) return;
 
-        DetectStairs();
         CheckPlayerDetection();
 
         if (chasing)
@@ -101,36 +67,15 @@ public class EnemyAI : MonoBehaviour
             HandleWalking();
     }
 
-    // Detecta se está em escada baseado na mudança de altura
-    void DetectStairs()
-    {
-        float currentHeight = transform.position.y;
-        float heightDifference = Mathf.Abs(currentHeight - lastHeight);
-
-        // Se mudou muito de altura em um frame, está em escada
-        isOnStairs = heightDifference > 0.1f && ai.velocity.magnitude > 0.1f;
-
-        lastHeight = currentHeight;
-
-        // Ajusta animação para escadas (se tiver)
-        if (aiAnim != null && isOnStairs)
-        {
-            // Você pode adicionar um trigger específico para escadas
-            // aiAnim.SetBool("onStairs", true);
-        }
-    }
-
     void CheckPlayerDetection()
     {
         Vector3 direction = (player.position - transform.position).normalized;
         RaycastHit hit;
 
-        // Raycast para detectar player
         if (Physics.Raycast(transform.position + rayCastOffset, direction, out hit, sightDistance))
         {
             if (hit.collider.CompareTag("Player"))
             {
-                // Verifica se há parede entre inimigo e player
                 if (!HasObstacleBetween(transform.position, player.position))
                 {
                     StartChasing();
@@ -139,47 +84,46 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    // Verifica se há obstáculo/parede entre dois pontos
     bool HasObstacleBetween(Vector3 start, Vector3 end)
     {
         Vector3 direction = (end - start).normalized;
         float distance = Vector3.Distance(start, end);
-        RaycastHit hit;
-
-        if (Physics.Raycast(start + rayCastOffset, direction, out hit, distance, obstacleLayer))
+        // Verifica se bate em algo que NÃO seja o player
+        if (Physics.Raycast(start + rayCastOffset, direction, distance, obstacleLayer))
         {
-            // Há uma parede/obstáculo no caminho
             return true;
         }
-
         return false;
     }
 
     void StartChasing()
     {
         walking = false;
-        StopCoroutine("stayIdle");
-        StopCoroutine("chaseRoutine");
-        StartCoroutine("chaseRoutine");
+
+        // Cancela idle sem matar todas as coroutines
+        if (isWaiting)
+        {
+            StopCoroutine("stayIdle");
+            ai.isStopped = false;
+            isWaiting = false;
+        }
+
         chasing = true;
+
+        StartCoroutine(chaseRoutine());
     }
+
 
     void HandleChasing()
     {
-        // NavMesh automaticamente encontra o caminho, incluindo escadas
-        dest = player.position;
-        ai.destination = dest;
+        ai.destination = player.position;
         ai.speed = chaseSpeed;
 
-        // Animações
         if (aiAnim != null)
         {
-            aiAnim.ResetTrigger("walk");
-            aiAnim.ResetTrigger("idle");
             aiAnim.SetTrigger("sprint");
         }
 
-        // Verifica se pegou o player
         float sqrDistance = (player.position - transform.position).sqrMagnitude;
         if (sqrDistance <= catchDistance * catchDistance)
         {
@@ -189,117 +133,68 @@ public class EnemyAI : MonoBehaviour
 
     void HandleWalking()
     {
-        if (currentDest == null) return;
+        if (currentDest == null || isWaiting) return; // Se estiver esperando, não faz nada
 
-        dest = currentDest.position;
-        ai.destination = dest;
+        ai.destination = currentDest.position;
         ai.speed = walkSpeed;
 
-        // Animações
-        if (aiAnim != null)
+        if (aiAnim != null) aiAnim.SetTrigger("walk");
+
+        // Verifica se chegou (CORREÇÃO DO BUG AQUI)
+        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance)
         {
-            aiAnim.ResetTrigger("sprint");
-            aiAnim.ResetTrigger("idle");
-            aiAnim.SetTrigger("walk");
+            StartIdleState();
         }
-
-        // Chegou no destino - VERIFICA SE ESTÁ NO NAVMESH PRIMEIRO
-        if (ai.isOnNavMesh && ai.hasPath && !ai.pathPending)
-        {
-            if (ai.remainingDistance <= ai.stoppingDistance)
-            {
-                StartIdleState();
-            }
-        }
-    }
-
-    void CatchPlayer()
-    {
-        player.gameObject.SetActive(false);
-
-        if (aiAnim != null)
-        {
-            aiAnim.ResetTrigger("walk");
-            aiAnim.ResetTrigger("idle");
-            aiAnim.ResetTrigger("sprint");
-            aiAnim.SetTrigger("jumpscare");
-        }
-
-        StartCoroutine(deathRoutine());
-        chasing = false;
-        ai.isStopped = true;
     }
 
     void StartIdleState()
     {
-        if (aiAnim != null)
-        {
-            aiAnim.ResetTrigger("sprint");
-            aiAnim.ResetTrigger("walk");
-            aiAnim.SetTrigger("idle");
-        }
-
-        ai.speed = 0;
-        StopCoroutine("stayIdle");
-        StartCoroutine("stayIdle");
+        isWaiting = true; // Trava para não chamar essa função de novo
         walking = false;
+        ai.isStopped = true; // Para o NavMesh Agent fisicamente
+
+        if (aiAnim != null) aiAnim.SetTrigger("idle");
+
+        StartCoroutine(stayIdle());
     }
 
     IEnumerator stayIdle()
     {
-        idleTime = Random.Range(minIdleTime, maxIdleTime);
-        yield return new WaitForSeconds(idleTime);
+        float waitTime = Random.Range(minIdleTime, maxIdleTime);
+        yield return new WaitForSeconds(waitTime);
 
+        // Volta a andar
+        ai.isStopped = false;
+        isWaiting = false; // Destrava
         walking = true;
-        randNum = Random.Range(0, destinations.Count);
-        currentDest = destinations[randNum];
+
+        // Escolhe novo ponto
+        if (destinations.Count > 0)
+            currentDest = destinations[Random.Range(0, destinations.Count)];
+    }
+
+    void CatchPlayer()
+    {
+        ai.isStopped = true;
+        player.gameObject.SetActive(false); // Some com o player
+
+        if (aiAnim != null) aiAnim.SetTrigger("jumpscare");
+
+        StartCoroutine(deathRoutine());
     }
 
     IEnumerator chaseRoutine()
     {
-        chaseTime = Random.Range(minChaseTime, maxChaseTime);
-        yield return new WaitForSeconds(chaseTime);
-
-        walking = true;
+        yield return new WaitForSeconds(Random.Range(minChaseTime, maxChaseTime));
         chasing = false;
-        randNum = Random.Range(0, destinations.Count);
-        currentDest = destinations[randNum];
+        walking = true;
+        if (destinations.Count > 0)
+            currentDest = destinations[Random.Range(0, destinations.Count)];
     }
 
     IEnumerator deathRoutine()
     {
         yield return new WaitForSeconds(jumpscareTime);
         SceneManager.LoadScene(deathScene);
-    }
-
-    // Visualização no editor
-    void OnDrawGizmos()
-    {
-        if (player != null)
-        {
-            // Raycast de visão
-            Gizmos.color = chasing ? Color.red : Color.yellow;
-            Vector3 direction = (player.position - transform.position).normalized;
-            Gizmos.DrawRay(transform.position + rayCastOffset, direction * sightDistance);
-
-            // Distância de captura
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, catchDistance);
-        }
-
-        // Mostra destino atual
-        if (currentDest != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, currentDest.position);
-            Gizmos.DrawWireSphere(currentDest.position, 0.5f);
-        }
-
-        // Mostra se está em escada
-        if (Application.isPlaying && isOnStairs)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.position, 1f);
-        }
     }
 }
