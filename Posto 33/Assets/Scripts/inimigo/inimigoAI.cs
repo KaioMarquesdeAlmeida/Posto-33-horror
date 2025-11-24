@@ -55,31 +55,31 @@ public class EnemyAI : MonoBehaviour
 
 
     void Start(){
-        // --- BLOCO DE AUTO-DIAGNÓSTICO (INSPECTOR E COMPONENTES) ---
+      
 
         if (player == null)
         {
-            Debug.LogError("❌ Player não atribuído no Inspector!", this);
+            Debug.LogError("Player não atribuído no Inspector!", this);
         }
         else if (!player.CompareTag("Player"))
         {
-            Debug.LogError("❌ Tag do Player incorreta! O GameObject referenciado (Player) precisa da Tag 'Player'.", player);
+            Debug.LogError("Tag do Player incorreta! O GameObject referenciado (Player) precisa da Tag 'Player'.", player);
         }
 
         if (ai == null)
         {
-            Debug.LogError("❌ NavMeshAgent não encontrado/atribuído!", this);
+            Debug.LogError("NavMeshAgent não encontrado/atribuído!", this);
         }
 
         // Checagem se o inimigo tem um Collider ativo para o Raycast
         // Note: O Raycast também pode falhar se o Player não tiver um Collider.
         if (GetComponent<Collider>() == null)
         {
-            Debug.LogError("❌ O Inimigo precisa de um Collider para interação física/jumpscare!", this);
+            Debug.LogError("O Inimigo precisa de um Collider para interação física/jumpscare!", this);
         }
 
         // Se passou por todas as checagens críticas (sem parar a execução):
-        Debug.Log("✅ Configuração Inicial OK. Iniciando Patrulha.");
+        Debug.Log("Configuração Inicial OK. Iniciando Patrulha.");
         
         // IA começa gerando um ponto aleatório para andar
         Vector3 initialDest = GetRandomPoint(transform.position, wanderRadius);
