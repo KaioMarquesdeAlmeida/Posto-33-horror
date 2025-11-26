@@ -1529,11 +1529,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 333011475734556803, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_Layer
-      value: 3
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 441950807598750655, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_Layer
-      value: 3
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 2053964776279691915, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_LocalScale.x
@@ -1593,11 +1593,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8555051844310360725, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_Layer
-      value: 3
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8555051844310360725, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: Enemy
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -1658,23 +1658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   ai: {fileID: 1420765778}
   aiAnim: {fileID: 1420765781}
-  player: {fileID: 1603900968}
-  destinations:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  player: {fileID: 339087223}
   walkSpeed: 2
   chaseSpeed: 5
   minIdleTime: 2
@@ -1687,12 +1671,10 @@ MonoBehaviour:
   maxChaseTime: 10
   rayCastOffset: {x: 0, y: 1, z: 0}
   maxSearchTime: 5
-  obstacleCheckDistance: 2
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
-  stairCheckDistance: 1.5
-  deathScene: DeathScene
+  deathScene: Morte
   jumpscareTime: 2
 --- !u!95 &1420765781
 Animator:
@@ -1859,7 +1841,7 @@ GameObject:
   - component: {fileID: 1499348050}
   m_Layer: 9
   m_Name: Root
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

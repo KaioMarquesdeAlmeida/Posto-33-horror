@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - wall
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -16,7 +17,7 @@ TagManager:
   - Player
   - NPC
   - PostProcessing
-  - 
+  - Inimigo
   - 
   - 
   - 

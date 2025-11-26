@@ -11,10 +11,6 @@ public class EnemyAI : MonoBehaviour
     public Animator aiAnim;
     public Transform player;
 
-    [Header("Destinos")]
-
-    public List<Transform> destinations;
-
     [Header("Velocidades")]
     public float walkSpeed = 2f;
     public float chaseSpeed = 5f;
@@ -28,7 +24,7 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Perseguição")]
     public float sightDistance = 10f;
-    public float viewAngle = 90f; //Campo de visão
+    public float viewAngle = 90f;
     public float catchDistance = 2f;
     public float minChaseTime = 5f;
     public float maxChaseTime = 10f;
@@ -38,58 +34,37 @@ public class EnemyAI : MonoBehaviour
     public float maxSearchTime = 3f;
 
     [Header("Detecção de Terreno")]
-    public float obstacleCheckDistance = 2f;
     public LayerMask obstacleLayer;
-    public float stairCheckDistance = 1.5f;
 
     [Header("Death Scene")]
     public string deathScene = "DeathScene";
     public float jumpscareTime = 2f;
 
-
     private bool walking;
     private bool chasing;
-    private bool searching = false;
-    private bool isWaiting = false;
+    private bool searching;
+    private bool isWaiting; // Importante para não travar o loop
     private Vector3 lastKnownPlayerPosition;
 
-
-    void Start(){
-      
-
-        if (player == null)
+    void Start()
+    {
+        // Seguranças
+        if (player == null || ai == null)
         {
-            Debug.LogError("Player não atribuído no Inspector!", this);
-        }
-        else if (!player.CompareTag("Player"))
-        {
-            Debug.LogError("Tag do Player incorreta! O GameObject referenciado (Player) precisa da Tag 'Player'.", player);
+            Debug.LogError("Faltam componentes no EnemyAI!");
+            enabled = false;
+            return;
         }
 
-        if (ai == null)
-        {
-            Debug.LogError("NavMeshAgent não encontrado/atribuído!", this);
-        }
-
-        // Checagem se o inimigo tem um Collider ativo para o Raycast
-        // Note: O Raycast também pode falhar se o Player não tiver um Collider.
-        if (GetComponent<Collider>() == null)
-        {
-            Debug.LogError("O Inimigo precisa de um Collider para interação física/jumpscare!", this);
-        }
-
-        // Se passou por todas as checagens críticas (sem parar a execução):
-        Debug.Log("Configuração Inicial OK. Iniciando Patrulha.");
-        
-        // IA começa gerando um ponto aleatório para andar
-        Vector3 initialDest = GetRandomPoint(transform.position, wanderRadius);
-        if (ai != null) // Verifica novamente, caso o erro acima não tenha impedido
-        {
-            ai.destination = initialDest;
-        }
+        // Config inicial
         walking = true;
-    }
+        chasing = false;
+        searching = false;
+        isWaiting = false;
 
+        // Vai para o primeiro ponto
+        GoToRandomPoint();
+    }
 
     void Update()
     {
@@ -105,183 +80,215 @@ public class EnemyAI : MonoBehaviour
             HandleWalking();
     }
 
-    /*
-    void CheckPlayerDetection(){
-        if (player == null) return;
-
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        RaycastHit hit;
-        bool playerIsVisible = false;
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-        // PASSO 1: Verificar a Distância
-        if (distanceToPlayer <= sightDistance)
-        {
-            // PASSO 2: Verificar o Ângulo (FOV)
-            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-
-            if (angleToPlayer <= viewAngle / 2f) // Divide por 2 pois o ângulo é simétrico
-            {
-                // PASSO 3: Verificar a Linha de Visão (Raycast)
-                if (Physics.Raycast(transform.position + rayCastOffset, directionToPlayer, out hit, sightDistance))
-                {
-                    if (hit.collider.CompareTag("Player"))
-                    {
-                        // PASSO 4: Verificar Obstáculos
-                        if (!HasObstacleBetween(transform.position, player.position))
-                        {
-                            playerIsVisible = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (playerIsVisible){
-            lastKnownPlayerPosition = player.position;
-            if (searching)
-            {
-                searching = false;
-                StopCoroutine("searchRoutine");
-            }
-            if (!chasing)
-            {
-                StartChasing();
-            }
-            else
-            {
-                StopCoroutine("chaseRoutine");
-                StartCoroutine("chaseRoutine");
-            }
-        }
-        else if (chasing)
-        {
-            StartSearching();
-        }
-    }
-    */
     void CheckPlayerDetection()
     {
-        if (player == null) return;
-
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        RaycastHit hit;
-        bool playerIsVisible = false;
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // PASSO 1: Verificar a Distância
+        bool canSeePlayer = false;
+
+        // CONFIGURAÇÃO DA "AUDIÇÃO" (Distância que ele te percebe de costas)
+        float proximitySense = 3.0f;
+
+        // 1. Verifica se está dentro da distância de visão GERAL
         if (distanceToPlayer <= sightDistance)
         {
-            // PASSO 2: Verificar o Ângulo (FOV)
-            float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+            // 2. Lógica Combinada: (Está no Ângulo de Visão?) OU (Está Muito Perto?)
+            bool inAngle = Vector3.Angle(transform.forward, directionToPlayer) <= viewAngle / 2f;
+            bool tooClose = distanceToPlayer <= proximitySense;
 
-            if (angleToPlayer <= viewAngle / 2f) // Divide por 2 pois o ângulo é simétrico (ex: 45 graus para cada lado se viewAngle for 90)
+            if (inAngle || tooClose)
             {
-                // PASSO 3: Verificar a Linha de Visão (Raycast)
-                // O Raycast deve acertar algo dentro do alcance.
+                // 3. Raio (Raycast) para garantir que não tem parede no meio
+                RaycastHit hit;
                 if (Physics.Raycast(transform.position + rayCastOffset, directionToPlayer, out hit, sightDistance))
                 {
-                    // PASSO 4: Verificar se o que foi acertado é o Player
                     if (hit.collider.CompareTag("Player"))
                     {
-                        // PASSO 5: Verificar Obstáculos
-                        // Se o HasObstacleBetween retornar false, significa que a visão está livre.
+                        // 4. Obstáculos
                         if (!HasObstacleBetween(transform.position, player.position))
                         {
-                            // Player visível e sem bloqueios!
-                            playerIsVisible = true;
+                            canSeePlayer = true;
                         }
                     }
                 }
             }
         }
 
-        // --- Lógica de Transição de Estados ---
-
-        if (playerIsVisible)
+        // Lógica de Troca de Estado
+        if (canSeePlayer)
         {
-            // O jogador foi visto.
             lastKnownPlayerPosition = player.position;
-
-            if (searching)
-            {
-                // Para a busca se encontrar o player
-                searching = false;
-                StopCoroutine("searchRoutine");
-            }
 
             if (!chasing)
             {
                 StartChasing();
             }
-            else
-            {
-                // Reinicia o cronômetro de perseguição (mantém o chase ativo)
-                StopCoroutine("chaseRoutine");
-                StartCoroutine("chaseRoutine");
-            }
+            // Mantém a perseguição viva
+            StopCoroutine("chaseRoutine");
+            StartCoroutine("chaseRoutine");
         }
-        else if (chasing)
+        else if (chasing && !searching)
         {
-            // Jogador sumiu de vista: Inicia a Busca!
-            StartSearching();
+            // Perdeu de vista! 
+            // Em vez de seguir o player magicamente através da parede, 
+            // ele vai correr até o último local onde te viu.
+            ai.destination = lastKnownPlayerPosition;
         }
     }
 
-    private void OnDrawGizmos()
+
+    void StartChasing()
     {
-        if (player != null)
+        walking = false;
+        searching = false;
+        isWaiting = false;
+        chasing = true;
+
+        ai.isStopped = false;
+        ai.speed = chaseSpeed;
+
+        // CORREÇÃO: Trigger chamado só UMA vez aqui, não no Update
+        if (aiAnim != null) aiAnim.SetTrigger("sprint");
+
+        StopAllCoroutines();
+        StartCoroutine(chaseRoutine());
+    }
+
+    void HandleChasing()
+    {
+        ai.destination = player.position;
+
+        // Verifica captura
+        if ((player.position - transform.position).sqrMagnitude <= catchDistance * catchDistance)
         {
-            Vector3 startPos = transform.position + rayCastOffset;
-            Vector3 direction = (player.position - startPos).normalized;
+            CatchPlayer();
+        }
+    }
 
-            // Desenha as laterais do cone de visão (apenas para referência)
-            Vector3 leftLimit = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward;
-            Vector3 rightLimit = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
+    void StartSearching()
+    {
+        chasing = false;
+        walking = false;
+        isWaiting = false;
+        searching = true;
 
-            Gizmos.color = Color.blue;
-            Gizmos.DrawRay(startPos, leftLimit * sightDistance);
-            Gizmos.DrawRay(startPos, rightLimit * sightDistance);
+        ai.isStopped = false;
+        ai.speed = walkSpeed;
+        ai.destination = lastKnownPlayerPosition;
 
-            // Linha do Raycast (Centro do Cone)
-            RaycastHit hit;
-            if (Physics.Raycast(startPos, direction, out hit, sightDistance)){
-                // Cor da linha: Verde = Visto; Vermelho = Bloqueado/Objeto não-player
-                if (hit.collider.CompareTag("Player") && !HasObstacleBetween(transform.position, player.position)){
-                    Gizmos.color = Color.green; // Visão Clara!
-                }
-                else
-                {
-                    Gizmos.color = Color.red; // Bloqueado
-                }
-                Gizmos.DrawLine(startPos, hit.point);
-            }
-            else
+        if (aiAnim != null) aiAnim.SetTrigger("walk");
+
+        StopAllCoroutines();
+        StartCoroutine(searchRoutine());
+    }
+
+    void HandleSearching()
+    {
+        // Se chegou no local onde o player sumiu
+        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance)
+        {
+            // Fica parado olhando em volta (Idle) enquanto o tempo de busca corre
+            if (!isWaiting)
             {
-                // Nada atingido (máximo alcance)
-                Gizmos.color = Color.yellow; // Linha amarela para o Raycast que não acertou nada
-                Gizmos.DrawRay(startPos, direction * sightDistance);
+                if (aiAnim != null) aiAnim.SetTrigger("idle");
+                isWaiting = true; // Só visual, o timer searchRoutine cuida do resto
             }
         }
     }
+
+    void HandleWalking()
+    {
+       
+        if (isWaiting) return;
+
+        ai.speed = walkSpeed;
+
+        // CORREÇÃO DO BUG INFINITO: Verifica se !isWaiting antes de iniciar a espera
+        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance)
+        {
+            StartIdleState();
+        }
+    }
+
+    void StartIdleState()
+    {
+        isWaiting = true; // Trava
+        ai.isStopped = true;
+
+        // CORREÇÃO: Trigger chamado só uma vez
+        if (aiAnim != null) aiAnim.SetTrigger("idle");
+
+        StartCoroutine(stayIdle());
+    }
+
+    void GoToRandomPoint()
+    {
+        Vector3 nextDest = GetRandomPoint(transform.position, wanderRadius);
+        ai.destination = nextDest;
+        ai.isStopped = false;
+
+        // Volta a andar
+        if (aiAnim != null) aiAnim.SetTrigger("walk");
+    }
+
+    // --- COROUTINES ---
+
+    IEnumerator stayIdle()
+    {
+        yield return new WaitForSeconds(Random.Range(minIdleTime, maxIdleTime));
+
+        // Acabou o tempo de espera, volta a patrulhar
+        isWaiting = false;
+        walking = true;
+        GoToRandomPoint();
+    }
+
+    IEnumerator chaseRoutine()
+    {
+        // Persegue "às cegas" por um tempo antes de ir para o modo Busca
+        yield return new WaitForSeconds(Random.Range(minChaseTime, maxChaseTime));
+
+        StartSearching();
+    }
+
+    IEnumerator searchRoutine()
+    {
+        // Fica no modo busca (no local onde player sumiu) por um tempo
+        yield return new WaitForSeconds(maxSearchTime);
+
+        // Se não achou, volta a patrulhar
+        searching = false;
+        walking = true;
+        isWaiting = false;
+        GoToRandomPoint();
+    }
+
+    IEnumerator deathRoutine()
+    {
+        yield return new WaitForSeconds(jumpscareTime);
+        SceneManager.LoadScene(deathScene);
+    }
+
+    void CatchPlayer()
+    {
+        ai.isStopped = true;
+        player.gameObject.SetActive(false);
+        if (aiAnim != null) aiAnim.SetTrigger("jumpscare");
+        StartCoroutine(deathRoutine());
+    }
+
+    // --- UTILITÁRIOS ---
+
     bool HasObstacleBetween(Vector3 start, Vector3 end)
     {
         Vector3 direction = (end - start).normalized;
         float distance = Vector3.Distance(start, end);
-
-         // O Raycast verifica a distância até o fim da visão
-        if (Physics.Raycast(start + rayCastOffset, direction, out RaycastHit hit, distance, obstacleLayer))
-        {
-            // Se acertou algo na Obstacle Layer antes do player, significa que há bloqueio.
+        if (Physics.Raycast(start + rayCastOffset, direction, distance, obstacleLayer))
             return true;
-        }
-
-        // Se o Raycast principal já passou por todos os checks (Tags e Distância)
-        // e este Raycast de bloqueio falhou, significa que a visão está livre.
         return false;
     }
 
-    // Patrulha Aleatória Contínua 
     Vector3 GetRandomPoint(Vector3 center, float range)
     {
         for (int i = 0; i < 10; i++)
@@ -296,170 +303,22 @@ public class EnemyAI : MonoBehaviour
         return center;
     }
 
-    void HandleWalking()
+    // Gizmos (mantive o seu, estava ótimo)
+    private void OnDrawGizmos()
     {
-        // Remove isWaiting e isStopped para fluidez
-        ai.speed = walkSpeed;
-
-        if (aiAnim != null) aiAnim.SetTrigger("walk");
-
-        // Se chegou ao destino, escolhe o próximo imediatamente (fluidez)
-        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance)
+        if (player != null)
         {
-            // Pequena pausa (Idle) antes de escolher o próximo ponto aleatório
-            StartIdleState();
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, wanderRadius);
+
+            Vector3 startPos = transform.position + rayCastOffset;
+            Vector3 direction = (player.position - startPos).normalized;
+            Vector3 leftLimit = Quaternion.Euler(0, -viewAngle / 2, 0) * transform.forward;
+            Vector3 rightLimit = Quaternion.Euler(0, viewAngle / 2, 0) * transform.forward;
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(startPos, leftLimit * sightDistance);
+            Gizmos.DrawRay(startPos, rightLimit * sightDistance);
         }
-    }
-
-    IEnumerator stayIdle()
-    {
-        float waitTime = Random.Range(minIdleTime, maxIdleTime);
-        ai.isStopped = true; // Pausa
-        yield return new WaitForSeconds(waitTime);
-        ai.isStopped = false; // Continua
-
-        // Transição para WALKING (Patrulha Aleatória)
-        Vector3 nextDest = GetRandomPoint(transform.position, wanderRadius);
-
-        ai.destination = nextDest;
-        isWaiting = false;
-        walking = true;
-    }
-
-    //---------------------------------------------------------
-    // Perseguição (Chase)
-    //---------------------------------------------------------
-
-    void StartChasing()
-    {
-        // Debug.Log("ENTRANDO EM MODO PERSEGUIÇÃO!"); // Ative este log para testar a detecção
-
-        walking = false;
-        searching = false;
-
-        if (isWaiting)
-        {
-            StopCoroutine("stayIdle");
-            isWaiting = false;
-        }
-        ai.isStopped = false;
-
-        chasing = true;
-
-        StartCoroutine(chaseRoutine());
-    }
-
-    void HandleChasing()
-    {
-        // Debug.Log("Perseguindo: " + player.position); // Ative este log para testar se está no estado
-
-        ai.destination = player.position;
-        ai.speed = chaseSpeed;
-
-        if (aiAnim != null)
-        {
-            aiAnim.SetTrigger("sprint");
-        }
-
-        float sqrDistance = (player.position - transform.position).sqrMagnitude;
-        if (sqrDistance <= catchDistance * catchDistance)
-        {
-            CatchPlayer();
-        }
-    }
-
-    IEnumerator chaseRoutine()
-    {
-        yield return new WaitForSeconds(Random.Range(minChaseTime, maxChaseTime));
-        chasing = false;
-    }
-
-    //---------------------------------------------------------
-    // Busca (Search)
-    //---------------------------------------------------------
-
-    void StartSearching()
-    {
-        walking = false;
-        chasing = false;
-        isWaiting = false;
-
-        StopCoroutine("chaseRoutine");
-
-        searching = true;
-
-        ai.isStopped = false;
-        ai.destination = lastKnownPlayerPosition;
-        ai.speed = walkSpeed;
-
-        if (aiAnim != null) aiAnim.SetTrigger("walk");
-
-        StartCoroutine(searchRoutine());
-    }
-
-    void HandleSearching()
-    {
-        ai.speed = walkSpeed;
-
-        // Se chegou ao último local conhecido, para e espera o tempo de busca
-        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance + 0.1f)
-        {
-            ai.isStopped = true;
-        }
-        else
-        {
-            ai.isStopped = false;
-        }
-    }
-
-    IEnumerator searchRoutine()
-    {
-        yield return new WaitForSeconds(maxSearchTime);
-
-        if (!chasing)
-        {
-            // Falhou em encontrar. Volta a patrulhar aleatoriamente.
-            searching = false;
-            walking = true;
-
-            isWaiting = false;
-            ai.isStopped = false;
-
-            Vector3 nextDest = GetRandomPoint(transform.position, wanderRadius);
-            ai.destination = nextDest;
-        }
-    }
-
-    //---------------------------------------------------------
-    // Funções Auxiliares
-    //---------------------------------------------------------
-
-    void StartIdleState()
-    {
-        isWaiting = true;
-        walking = false;
-        chasing = false;
-        searching = false; // Garante que não está buscando durante o idle
-        ai.isStopped = true;
-
-        if (aiAnim != null) aiAnim.SetTrigger("idle");
-
-        StartCoroutine(stayIdle());
-    }
-
-    void CatchPlayer()
-    {
-        ai.isStopped = true;
-        player.gameObject.SetActive(false);
-
-        if (aiAnim != null) aiAnim.SetTrigger("jumpscare");
-
-        StartCoroutine(deathRoutine());
-    }
-
-    IEnumerator deathRoutine()
-    {
-        yield return new WaitForSeconds(jumpscareTime);
-        SceneManager.LoadScene(deathScene);
     }
 }
