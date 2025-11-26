@@ -46,8 +46,7 @@ public class EnemyAI : MonoBehaviour
     private bool isWaiting; // Importante para não travar o loop
     private Vector3 lastKnownPlayerPosition;
 
-    void Start()
-    {
+    void Start(){
         // Seguranças
         if (player == null || ai == null)
         {
@@ -128,8 +127,7 @@ public class EnemyAI : MonoBehaviour
             StopCoroutine("chaseRoutine");
             StartCoroutine("chaseRoutine");
         }
-        else if (chasing && !searching)
-        {
+        else if (chasing && !searching){
             // Perdeu de vista! 
             // Em vez de seguir o player magicamente através da parede, 
             // ele vai correr até o último local onde te viu.
@@ -138,8 +136,7 @@ public class EnemyAI : MonoBehaviour
     }
 
 
-    void StartChasing()
-    {
+    void StartChasing(){
         walking = false;
         searching = false;
         isWaiting = false;
@@ -155,8 +152,7 @@ public class EnemyAI : MonoBehaviour
         StartCoroutine(chaseRoutine());
     }
 
-    void HandleChasing()
-    {
+    void HandleChasing(){
         ai.destination = player.position;
 
         // Verifica captura
@@ -166,8 +162,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    void StartSearching()
-    {
+    void StartSearching(){
         chasing = false;
         walking = false;
         isWaiting = false;
@@ -183,8 +178,7 @@ public class EnemyAI : MonoBehaviour
         StartCoroutine(searchRoutine());
     }
 
-    void HandleSearching()
-    {
+    void HandleSearching(){
         // Se chegou no local onde o player sumiu
         if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance)
         {
@@ -197,33 +191,26 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    void HandleWalking()
-    {
-       
+    void HandleWalking(){ 
         if (isWaiting) return;
 
         ai.speed = walkSpeed;
 
-        // CORREÇÃO DO BUG INFINITO: Verifica se !isWaiting antes de iniciar a espera
-        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance)
-        {
+        if (!ai.pathPending && ai.remainingDistance <= ai.stoppingDistance){
             StartIdleState();
         }
     }
 
-    void StartIdleState()
-    {
+    void StartIdleState(){
         isWaiting = true; // Trava
         ai.isStopped = true;
 
-        // CORREÇÃO: Trigger chamado só uma vez
         if (aiAnim != null) aiAnim.SetTrigger("idle");
 
         StartCoroutine(stayIdle());
     }
 
-    void GoToRandomPoint()
-    {
+    void GoToRandomPoint(){
         Vector3 nextDest = GetRandomPoint(transform.position, wanderRadius);
         ai.destination = nextDest;
         ai.isStopped = false;
@@ -232,10 +219,9 @@ public class EnemyAI : MonoBehaviour
         if (aiAnim != null) aiAnim.SetTrigger("walk");
     }
 
-    // --- COROUTINES ---
+   
 
-    IEnumerator stayIdle()
-    {
+    IEnumerator stayIdle(){
         yield return new WaitForSeconds(Random.Range(minIdleTime, maxIdleTime));
 
         // Acabou o tempo de espera, volta a patrulhar
@@ -244,16 +230,14 @@ public class EnemyAI : MonoBehaviour
         GoToRandomPoint();
     }
 
-    IEnumerator chaseRoutine()
-    {
+    IEnumerator chaseRoutine(){
         // Persegue "às cegas" por um tempo antes de ir para o modo Busca
         yield return new WaitForSeconds(Random.Range(minChaseTime, maxChaseTime));
 
         StartSearching();
     }
 
-    IEnumerator searchRoutine()
-    {
+    IEnumerator searchRoutine(){
         // Fica no modo busca (no local onde player sumiu) por um tempo
         yield return new WaitForSeconds(maxSearchTime);
 
@@ -264,14 +248,12 @@ public class EnemyAI : MonoBehaviour
         GoToRandomPoint();
     }
 
-    IEnumerator deathRoutine()
-    {
+    IEnumerator deathRoutine(){
         yield return new WaitForSeconds(jumpscareTime);
         SceneManager.LoadScene(deathScene);
     }
 
-    void CatchPlayer()
-    {
+    void CatchPlayer(){
         ai.isStopped = true;
         player.gameObject.SetActive(false);
         if (aiAnim != null) aiAnim.SetTrigger("jumpscare");
@@ -280,8 +262,7 @@ public class EnemyAI : MonoBehaviour
 
     // --- UTILITÁRIOS ---
 
-    bool HasObstacleBetween(Vector3 start, Vector3 end)
-    {
+    bool HasObstacleBetween(Vector3 start, Vector3 end){
         Vector3 direction = (end - start).normalized;
         float distance = Vector3.Distance(start, end);
         if (Physics.Raycast(start + rayCastOffset, direction, distance, obstacleLayer))
@@ -289,8 +270,7 @@ public class EnemyAI : MonoBehaviour
         return false;
     }
 
-    Vector3 GetRandomPoint(Vector3 center, float range)
-    {
+    Vector3 GetRandomPoint(Vector3 center, float range){
         for (int i = 0; i < 10; i++)
         {
             Vector3 randomPoint = center + Random.insideUnitSphere * range;
@@ -304,10 +284,8 @@ public class EnemyAI : MonoBehaviour
     }
 
     // Gizmos (mantive o seu, estava ótimo)
-    private void OnDrawGizmos()
-    {
-        if (player != null)
-        {
+    private void OnDrawGizmos(){
+        if (player != null){
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, wanderRadius);
 
