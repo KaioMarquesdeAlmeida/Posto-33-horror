@@ -1659,13 +1659,13 @@ MonoBehaviour:
   ai: {fileID: 1420765778}
   aiAnim: {fileID: 1420765781}
   player: {fileID: 339087223}
-  walkSpeed: 2
+  walkSpeed: 3
   chaseSpeed: 5
   minIdleTime: 2
   maxIdleTime: 5
   wanderRadius: 15
   sightDistance: 10
-  viewAngle: 90
+  viewAngle: 200
   catchDistance: 2
   minChaseTime: 5
   maxChaseTime: 10

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5577c97ed27cc8e43b5c22d11434ff4b
+guid: 8eb9228e02d9d4d46bb744a3668ffbdc
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - VT323
+  - Tox Typewriter
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
