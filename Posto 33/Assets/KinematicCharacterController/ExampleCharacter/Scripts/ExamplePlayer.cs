@@ -1,9 +1,4 @@
-﻿using KinematicCharacterController;
-using KinematicCharacterController.Examples;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Animations;
-using UnityEditor.ShaderGraph;
+﻿
 using UnityEngine;
 
 namespace KinematicCharacterController.Examples

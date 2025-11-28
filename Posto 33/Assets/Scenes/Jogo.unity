@@ -630,7 +630,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2594713235056830955, guid: 0b26cd811d173394ea7ee69051b77c63, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2100373894}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b26cd811d173394ea7ee69051b77c63, type: 3}
 --- !u!1 &832575517
@@ -781,15 +784,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2053964776279691915, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 33.7
+      value: 196.6
       objectReference: {fileID: 0}
     - target: {fileID: 2053964776279691915, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.7
+      value: 4.36
       objectReference: {fileID: 0}
     - target: {fileID: 2053964776279691915, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 365.9
+      value: 150.5
       objectReference: {fileID: 0}
     - target: {fileID: 2053964776279691915, guid: 01ecd22b2c8abb14e9aac8746f1b90f5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -943,11 +946,11 @@ MonoBehaviour:
   chaseSpeed: 5
   minIdleTime: 0.95
   maxIdleTime: 1.38
-  minDistanceFromPlayer: 9.81
-  maxDistanceFromPlayer: 49.5
+  minDistanceFromPlayer: 9.18
+  maxDistanceFromPlayer: 32.5
   sightDistance: 10.6
-  viewAngle: 135.4
-  catchDistance: 2
+  viewAngle: 360
+  catchDistance: 3.04
   minChaseTime: 5
   maxChaseTime: 10.2
   rayCastOffset: {x: 0, y: 1, z: 0}
@@ -1281,6 +1284,10 @@ PrefabInstance:
       propertyPath: RainIntensity
       value: 0.48
       objectReference: {fileID: 0}
+    - target: {fileID: 11437536, guid: 69b40ef7ee16c834c844b3fa26e0fdda, type: 3}
+      propertyPath: RainSoundAudioMixer
+      value: 
+      objectReference: {fileID: 24300002, guid: 89d1b4bfa13359a4f803d42433b34ae8, type: 2}
     - target: {fileID: 11482444, guid: 69b40ef7ee16c834c844b3fa26e0fdda, type: 3}
       propertyPath: lifetime
       value: 0.05
@@ -1382,7 +1389,7 @@ AudioSource:
   m_GameObject: {fileID: 1593708730}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 89d1b4bfa13359a4f803d42433b34ae8, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 43ac65a133769d944af2bd19442aa4ee, type: 3}
   m_PlayOnAwake: 1
@@ -1479,7 +1486,7 @@ AudioSource:
   m_GameObject: {fileID: 1593708730}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 89d1b4bfa13359a4f803d42433b34ae8, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 8ecbfac4dedd21649914c20a966102db, type: 3}
   m_PlayOnAwake: 1
@@ -1711,6 +1718,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1984214535 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2594713235056830955, guid: 0b26cd811d173394ea7ee69051b77c63, type: 3}
+  m_PrefabInstance: {fileID: 552056265}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2100373890
 GameObject:
   m_ObjectHideFlags: 0
@@ -1816,12 +1828,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2100373890}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 311.63, y: 9.25, z: 349.45}
+  m_LocalRotation: {x: -0, y: -0.47961724, z: 0, w: 0.8774779}
+  m_LocalPosition: {x: -0.3, y: 0.88, z: 5.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1984214535}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2100373895
 MonoBehaviour:
@@ -2159,5 +2171,4 @@ SceneRoots:
   - {fileID: 939889113}
   - {fileID: 1593708734}
   - {fileID: 1177371256}
-  - {fileID: 2100373894}
   - {fileID: 1875073834}

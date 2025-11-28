@@ -1,6 +1,5 @@
 using System.Collections;
-using System.Linq;
-using UnityEditor.ShaderGraph;
+
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
