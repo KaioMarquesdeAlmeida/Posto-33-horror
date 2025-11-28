@@ -17,6 +17,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: 192b77ac7bbba034cad1c6b004bd2c0b
+  - enabled: 1
+    path: Assets/Scenes/Jogo.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Vitoria.unity
+    guid: 55cd8ce3de5d21743a6398dc0d78f5f7
+  - enabled: 1
+    path: Assets/Scenes/Morte.unity
+    guid: 91972e458449ad04ab06c0425462f592
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 8067e0a3499c4b44ab5a819cfe0c9f88, type: 2}

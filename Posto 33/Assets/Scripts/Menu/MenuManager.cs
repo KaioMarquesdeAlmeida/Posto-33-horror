@@ -9,18 +9,29 @@ public class MenuManager : MonoBehaviour{
     [SerializeField] private GameObject painelMenuInicial;
     [SerializeField] private GameObject painelopcaoes;
 
-    public void jogar(){
-        SceneManager.LoadScene(nomeDoLevelJogo);
+    public void teste() { 
+        Debug.Log("AA");
+
+    }
+    public void Jogar(){
+        Debug.Log("AA");
+        SceneManager.LoadScene("Jogo");
     }
 
     public void AbrirOpcaoes(){
-        painelMenuInicial.SetActive(false);
-        painelopcaoes.SetActive(true);
+        if (painelopcaoes && painelMenuInicial) {
+            painelMenuInicial.SetActive(false);
+            painelopcaoes.SetActive(true);
+        }
+        
     }
 
     public void fecharOpcoes(){
-        painelopcaoes.SetActive(false);
-        painelMenuInicial.SetActive(true);
+        if (painelopcaoes && painelMenuInicial) {
+            painelopcaoes.SetActive(false);
+            painelMenuInicial.SetActive(true);
+        }
+        
     }
 
     public void Sairjogo(){

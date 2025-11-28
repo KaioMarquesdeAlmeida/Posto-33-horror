@@ -269,7 +269,7 @@ public class EnemyAI : MonoBehaviour
     IEnumerator deathRoutine()
     {
         yield return new WaitForSeconds(jumpscareTime);
-        SceneManager.LoadScene(deathScene);
+        SceneManager.LoadScene("Morte");
     }
 
     void CatchPlayer()

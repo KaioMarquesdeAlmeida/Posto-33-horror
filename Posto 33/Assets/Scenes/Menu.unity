@@ -999,7 +999,7 @@ RectTransform:
   m_GameObject: {fileID: 589619874}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.58455, y: 0.58455, z: 0.58455}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1799983392}
@@ -1009,7 +1009,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -108, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &613459335
@@ -2238,7 +2238,7 @@ RectTransform:
   m_GameObject: {fileID: 1483109454}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.49625, y: 0.49625, z: 0.49625}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2046511724}
@@ -2252,7 +2252,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -198.8446, y: -18.126385}
+  m_AnchoredPosition: {x: 9, y: -18.126385}
   m_SizeDelta: {x: 871.3109, y: 661.2428}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1573816798
@@ -2291,7 +2291,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -521, y: -66}
+  m_AnchoredPosition: {x: -95, y: -66}
   m_SizeDelta: {x: 220.4049, y: 63.7846}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1573816800
@@ -2700,7 +2700,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -517, y: -179}
+  m_AnchoredPosition: {x: -91, y: -179}
   m_SizeDelta: {x: 220.4049, y: 63.7846}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1795774896
@@ -2833,7 +2833,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -542, y: 13}
+  m_AnchoredPosition: {x: -116, y: 13}
   m_SizeDelta: {x: 220.4049, y: 63.7846}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1799983393
@@ -2858,7 +2858,7 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
-    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 1, g: 0, b: 0, a: 1}
     m_PressedColor: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -2882,7 +2882,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 989602192}
         m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: jogar
+        m_MethodName: Jogar
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
